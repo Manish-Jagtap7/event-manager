@@ -1,0 +1,36 @@
+# Dependencies
+node_modules/
+*/node_modules/
+
+# Production builds
+dist/
+dist-ssr/
+frontend/dist/
+build/
+
+# Environment configuration
+.env
+.env.local
+.env.*.local
+*.env
+
+# SQLite Database journals and transient files
+*.db-journal
+*.db-wal
+*.db-shm
+
+# Antigravity & AI agent configs
+.agents/
+.agents
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Operating System & IDE Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

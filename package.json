@@ -1,0 +1,25 @@
+{
+  "name": "eventhub-college-portal",
+  "version": "1.0.0",
+  "description": "EventHub - Centralized College Event Management Web Application",
+  "type": "module",
+  "scripts": {
+    "start": "node start.js",
+    "build": "npm --prefix frontend run build",
+    "backend": "npm --prefix backend start",
+    "frontend": "npm --prefix frontend run dev",
+    "wipe": "npm --prefix backend run wipe",
+    "clean": "npm --prefix backend run wipe",
+    "seed": "npm --prefix backend run seed"
+  },
+  "keywords": [
+    "eventhub",
+    "college",
+    "event-management",
+    "sqlite",
+    "react",
+    "express"
+  ],
+  "author": "",
+  "license": "ISC"
+}
