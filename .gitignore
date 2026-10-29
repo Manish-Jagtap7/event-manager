@@ -5,8 +5,9 @@ node_modules/
 # Production builds
 dist/
 dist-ssr/
-frontend/dist/
 build/
+!frontend/dist/
+!frontend/dist/**
 
 # Environment configuration
 .env

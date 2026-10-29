@@ -21,17 +21,17 @@ if (!fs.existsSync(backendModules)) {
   execSync('npm install', { cwd: backendDir, stdio: 'inherit' })
 }
 
-// 2. Check Frontend Dependencies
-const frontendModules = path.join(frontendDir, 'node_modules')
-if (!fs.existsSync(frontendModules)) {
-  console.log('📦 Installing frontend dependencies...')
-  execSync('npm install', { cwd: frontendDir, stdio: 'inherit' })
-}
-
-// 3. Ensure Frontend Production Build Exists
+// 2. Ensure Frontend Production Build Exists
 if (!fs.existsSync(frontendDist) || !fs.existsSync(path.join(frontendDist, 'index.html'))) {
-  console.log('🔨 Building frontend production bundle (dist)...')
+  console.log('🔨 Building frontend bundle (dist)...')
+  const frontendModules = path.join(frontendDir, 'node_modules')
+  if (!fs.existsSync(frontendModules)) {
+    console.log('📦 Installing frontend build dependencies...')
+    execSync('npm install', { cwd: frontendDir, stdio: 'inherit' })
+  }
   execSync('npm run build', { cwd: frontendDir, stdio: 'inherit' })
+} else {
+  console.log('✅ Pre-compiled frontend bundle found in frontend/dist.')
 }
 
 // 4. Start Unified Server
