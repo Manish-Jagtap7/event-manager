@@ -39,12 +39,26 @@ cd backend && npm run wipe
 
 ---
 
-## 🚀 VPS Single Start Command (Production Deployment)
+## 🚀 Production Deployment (VPS / Cloud)
 
-When deploying on a VPS, run this single command from the project root. It automatically installs dependencies, builds the frontend, and launches the unified full-stack server on port `5000`:
+When deploying on a VPS or cloud PaaS (Render, Railway, etc.), run this single command from the project root. It automatically installs dependencies, builds the frontend, and launches the unified full-stack server:
 
 ```bash
 node start.js
 ```
 
 *(Alternatively, you can also run `npm start` from the root directory).*
+
+---
+
+## ⚙️ Environment Variables Reference
+
+When deploying, configure these environment variables in your hosting dashboard or in a `.env` file:
+
+| Variable | Required? | Recommended Production Value | Description |
+| :--- | :--- | :--- | :--- |
+| `NODE_ENV` | Optional | `production` | Sets runtime environment to production. |
+| `PORT` | Optional | `5000` (or auto-assigned) | Listening port for the unified Express server. Most cloud platforms (Render, Railway, Heroku) inject this automatically. |
+| `JWT_SECRET` | Recommended | `your_custom_secure_jwt_random_string` | Secret key used to sign and verify student/organizer authentication tokens. |
+| `VITE_API_BASE_URL` | Optional | `/api` | Relative API path for frontend requests. Defaults to `/api` in production unified builds. |
+| `NODE_VERSION` | Optional | `22` | Specifies Node.js version on cloud platforms (e.g. Render). |

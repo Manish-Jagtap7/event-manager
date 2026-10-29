@@ -18,6 +18,7 @@ import { certificatesRouter } from './routes/certificates.routes.js'
 import { reportsRouter } from './routes/reports.routes.js'
 
 dotenv.config()
+dotenv.config({ path: path.resolve(__dirname, '../.env') })
 
 // Initialize Relational SQL Database
 initDatabase()
@@ -43,7 +44,7 @@ app.get('/api/health', (req, res) => {
     status: 'online',
     timestamp: new Date().toISOString(),
     service: 'EventHub College Management REST API',
-    database: 'SQLite Relational Database (node:sqlite)',
+    database: 'SQLite Relational Database',
   })
 })
 

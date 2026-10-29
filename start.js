@@ -16,7 +16,8 @@ console.log('====================================================')
 
 // 1. Check Backend Dependencies
 const backendModules = path.join(backendDir, 'node_modules')
-if (!fs.existsSync(backendModules)) {
+const betterSqliteModule = path.join(backendModules, 'better-sqlite3')
+if (!fs.existsSync(backendModules) || !fs.existsSync(betterSqliteModule)) {
   console.log('📦 Installing backend dependencies...')
   execSync('npm install', { cwd: backendDir, stdio: 'inherit' })
 }

@@ -1,4 +1,3 @@
-import { DatabaseSync } from 'node:sqlite'
 import path from 'node:path'
 import fs from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -13,7 +12,18 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbPath = path.join(dataDir, 'eventhub.db')
-export const db = new DatabaseSync(dbPath)
+
+// Dual-engine support: Node 22+ built-in node:sqlite or Node 18/20 LTS better-sqlite3
+let DatabaseClass
+try {
+  const sqlite = await import('node:sqlite')
+  DatabaseClass = sqlite.DatabaseSync
+} catch {
+  const { default: BetterSqlite3 } = await import('better-sqlite3')
+  DatabaseClass = BetterSqlite3
+}
+
+export const db = new DatabaseClass(dbPath)
 
 // Initialize relational SQL tables
 export function initDatabase() {
