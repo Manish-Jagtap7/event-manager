@@ -13,17 +13,86 @@ if (!fs.existsSync(dataDir)) {
 
 const dbPath = path.join(dataDir, 'eventhub.db')
 
-// Dual-engine support: Node 22+ built-in node:sqlite or Node 18/20 LTS better-sqlite3
-let DatabaseClass
+// Dual-engine support: Node 22+ built-in node:sqlite or zero-dependency sql.js WASM fallback (Node 18/20 LTS)
+let dbInstance
+
 try {
+  if (process.env.FORCE_SQL_JS === 'true') throw new Error('Forced WASM mode')
   const sqlite = await import('node:sqlite')
-  DatabaseClass = sqlite.DatabaseSync
+  dbInstance = new sqlite.DatabaseSync(dbPath)
+  console.log('📦 Using native node:sqlite engine.')
 } catch {
-  const { default: BetterSqlite3 } = await import('better-sqlite3')
-  DatabaseClass = BetterSqlite3
+  console.log('📦 Built-in node:sqlite not present (Node <22). Initializing sql.js WASM engine...')
+  const { default: initSqlJs } = await import('sql.js')
+  const SQL = await initSqlJs()
+
+  let initialBuffer = null
+  if (fs.existsSync(dbPath)) {
+    try {
+      initialBuffer = fs.readFileSync(dbPath)
+    } catch {
+      initialBuffer = null
+    }
+  }
+
+  const sqlDb = initialBuffer && initialBuffer.length > 0
+    ? new SQL.Database(initialBuffer)
+    : new SQL.Database()
+
+  const persist = () => {
+    try {
+      const data = sqlDb.export()
+      fs.writeFileSync(dbPath, Buffer.from(data))
+    } catch (err) {
+      console.error('Error persisting database to disk:', err)
+    }
+  }
+
+  const normalizeParams = (args) => {
+    if (args.length === 1 && Array.isArray(args[0])) return args[0]
+    return args
+  }
+
+  dbInstance = {
+    exec(sql) {
+      sqlDb.exec(sql)
+      persist()
+    },
+    prepare(sql) {
+      return {
+        run(...params) {
+          sqlDb.run(sql, normalizeParams(params))
+          const changes = sqlDb.getRowsModified()
+          persist()
+          return { changes }
+        },
+        get(...params) {
+          const stmt = sqlDb.prepare(sql)
+          stmt.bind(normalizeParams(params))
+          if (stmt.step()) {
+            const row = stmt.getAsObject()
+            stmt.free()
+            return row
+          }
+          stmt.free()
+          return undefined
+        },
+        all(...params) {
+          const stmt = sqlDb.prepare(sql)
+          stmt.bind(normalizeParams(params))
+          const rows = []
+          while (stmt.step()) {
+            rows.push(stmt.getAsObject())
+          }
+          stmt.free()
+          return rows
+        },
+      }
+    },
+  }
 }
 
-export const db = new DatabaseClass(dbPath)
+export const db = dbInstance
 
 // Initialize relational SQL tables
 export function initDatabase() {
